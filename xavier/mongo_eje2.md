@@ -74,3 +74,22 @@ db.trips.find({"start station location.coordinates.0": {$lt: -74}}).count()
 1928
 
 ```
+
+## eje2.8:
+- En sample_training.inspections, ¿cuántas inspecciones se
+llevaron a cabo en la ciudad de "NEW YORK"? 
+```
+db.inspections.find({'address.city': {$eq: 'NEW YORK'}}).count()
+18279
+
+```
+
+## eje2.9:
+-  En sample_airbnb.listingsAndReviews, haga una query que
+devuelva el nombre y la dirección de los alojamientos que
+tengan "Internet"como primer elemento de "amenities"
+
+```
+db.listingsAndReviews.find({'amenities.0': {$eq: 'Internet'}}, {name: 1, address: 1, _id: 0})
+```
+
