@@ -134,6 +134,7 @@ db.lugares.aggregate([
     }
   }
 ])
+```
 
 ## Operadores de matriz en MongoDB (Basado en la página oficial de MongoDB)
 
