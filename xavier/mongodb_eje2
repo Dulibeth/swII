@@ -1,0 +1,3 @@
+eje2.1: db.companies.find({$expr: {$gt: ['$number_of_employees', '$founded_year']}}).count()
+324
+
