@@ -63,3 +63,14 @@ db.companies.find({funding_rounds: {$size: 8}}, {name: 1, _id: 0})
   { name: 'Biolex Therapeutics' }
 ]
 ```
+
+## eje2.7: 
+
+- En sample_training.trips, ¿cuántos viajes empiezan en
+estaciones que están al oeste de la longitud -74?
+
+```
+db.trips.find({"start station location.coordinates.0": {$lt: -74}}).count()
+1928
+
+```
