@@ -20,10 +20,13 @@ router.get('/', async (req, res) => {
   let results = await dbConnect
     .collection(COLLECTION)
     .find(query)
+    .project({_id:1, title:1, author:1 }) //apartado 2
     .sort({_id: -1})
     .limit(limit)
     .toArray()
     .catch(err => res.status(400).send('Error searching for books'));
+    results.forEach( book => {
+      book["link"] = `localhost:${process.env.PORT}${process.env.BASE_URI}/book/${book._id}`});  //apartado 3
   next = results.length == limit ? results[results.length - 1]._id : null;
   res.json({results, next}).status(200);
 });
@@ -59,7 +62,11 @@ router.delete('/:id', async (req, res) => {
   let result = await dbConnect
     .collection(COLLECTION)
     .deleteOne(query);
-  res.status(200).send(result);
+  if(result.deleteCount === 0){ //apartado 4
+    res.send("Invalid").status(400)
+  } else {
+    res.status(200).send(result);
+  }
 });
 
 module.exports = router;
