@@ -249,3 +249,92 @@ db.coleccion.find({}, { telefono: { tipo: 1 } })
 * **$cond:** Aplicar una condición para incluir o excluir campos.
 * **$meta:** Incluir información de metadatos sobre la consulta.
 
+## Agregaciones en MongoDB (Basado en la página oficial de MongoDB)
+
+El framework de agregaciones de MongoDB te permite realizar operaciones de transformación de datos más complejas y sofisticadas que las simples consultas con `find()`. 
+
+Las agregaciones se ejecutan en etapas, denominadas "pasos", que procesan los datos de un conjunto de documentos y los transforman en un nuevo resultado. 
+
+### Pasos principales:
+
+1. **$match:** Filtra los documentos que cumplen con la condición especificada.
+2. **$project:** Selecciona o excluye campos de los documentos.
+3. **$unwind:** Descomprime arrays en documentos separados.
+4. **$group:** Agrupa documentos según un criterio y realiza cálculos.
+5. **$sort:** Ordena los documentos según un campo o campos específicos.
+6. **$limit:** Limita el número de documentos devueltos.
+7. **$skip:** Omite un número especificado de documentos al principio.
+
+### Sintaxis básica:
+
+```
+db.coleccion.aggregate([
+  { $paso1: { <parámetros> } },
+  { $paso2: { <parámetros> } },
+  ...,
+  { $ultimoPaso: { <parámetros> } }
+])
+```
+
+### Ejemplos:
+
+**1. Calcular el salario total por departamento:**
+
+```
+db.empleados.aggregate([
+  { $group: { _id: "$departamento", salarioTotal: { $sum: "$salario" } } },
+  { $project: { _id: 1, departamento: 1, salarioTotal: 1 } }
+])
+```
+
+**2. Encontrar el producto con mayor venta por categoría:**
+
+```
+db.productos.aggregate([
+  { $unwind: "$ventas" },
+  { $group: { _id: { $concat: ["$categoria", "-", "$producto"] }, ventasTotales: { $sum: "$ventas.cantidad" } } },
+  { $sort: { ventasTotales: -1 } },
+  { $limit: 1 },
+  { $project: { _id: { $split: ["$_id", "-"] }, ventasTotales: 1 } }
+])
+```
+
+**3. Obtener la distribución de usuarios por edad en rangos:**
+
+```
+db.usuarios.aggregate([
+  { $group: { _id: { $bucket: { in: "$edad", boundaries: [0, 18, 30, 45, 60], includeUpper: true } }, total: { $count: 1 } } },
+  { $project: { _id: "$_id.groupBy", total: 1 } }
+])
+```
+
+## Ejemplo de una agregación simple en MongoDB
+
+**Objetivo:** Calcular el promedio de la edad de los usuarios en la colección `db.usuarios`.
+
+**Pipeline de agregación:**
+
+```
+db.usuarios.aggregate([
+  { $group: { _id: null, promedioEdad: { $avg: "$edad" } } },
+  { $project: { _id: 0, promedioEdad: 1 } }
+])
+```
+
+**Explicación:**
+
+1. **Etapa 1: $group:**
+   * **`_id`:** Se establece en `null` ya que no se requiere agrupar por ningún campo.
+   * **`promedioEdad`:** Se calcula el promedio de la edad de todos los usuarios utilizando el operador `$avg`.
+
+2. **Etapa 2: $project:**
+   * **`_id`:** Se elimina el campo `_id` generado en la etapa anterior.
+   * **`promedioEdad`:** Se mantiene el campo `promedioEdad` que contiene el valor promedio calculado.
+
+**Resultado esperado:**
+
+```json
+[
+  { "promedioEdad": 32.5 } // Ejemplo de valor promedio
+]
+```
