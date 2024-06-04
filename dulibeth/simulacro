@@ -20,4 +20,4 @@ Consulta:  db.listingsAndReviews.aggregate([{$group:{"_id":"$property_type", "co
 Apartado 4.
 En la colección listingAndReviews indique el número de alojamientos que tienen 2, 3, 4 o 5 bed
 
-db.listingsAndReviews.find({ $and: [{ "beds": { $gt: 1 }, "beds": { $lt: 5 } }] }).count()
+db.listingsAndReviews.find({ $and: [{ "beds": { $gte: 2 }, "beds": { $lte: 5 } }] }).count()
